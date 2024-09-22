@@ -1,46 +1,40 @@
-import mongoose, { Schema } from "mongoose"
-const userSchema = new Schema(
+import mongoose from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+
+
+const videoSchema = new Schema(
     {
-        username: {
-            tyepe: String,
-            required: true,
-            unique: true,
-            lowecase: true,
-            trim: true,
-            index:true //searchinng
+        videoFile: {
+            type : String, //cloudary url
+            required: true
         },
-        email: {
-            tyepe: String,
-            required: true,
-            unique: true,
-            lowecase: true,
-            trim: true,
+        thumbnail: {
+            type : String,
+            required: true
         },
-        fullname: {
-            tyepe: String,
-            required: true,
-            trim: true,
-            index:true
+        title: {
+            type : String,
+            required: true
         },
-        avatar: {
-            tyepe: String, //clodinary url
-            required: true,
+        description: {
+            type : String,
+            required: true
         },
-        avatar: {
-            tyepe: String, //clodinary url
+        duration: {
+            type : NUmber, //cloudary
+            required: true
         },
-        watchHistory: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Video"
-            }
-        ],
-        password: {
-            type: String,
-            required: [true, 'Password is required']
+        views: {
+            type : Number,
+            default: 0
         },
-        refreshToken: {
-            type: String
+        isPublished : {
+            type : Boolean,
+            default : true
+        },
+        owner : {
+            type: Schema.Types.ObjectId,
+            ref: "User"
         }
     },
     {
@@ -48,5 +42,6 @@ const userSchema = new Schema(
     }
 )
 
+videoSchema.plugin(mongooseAggregatePaginate)
 
-export const User = mongoose.model("User", userSchema)
+export const Video = mongoose.model("Video", videoSchema)
