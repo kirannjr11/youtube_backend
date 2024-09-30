@@ -5,32 +5,31 @@ import bcrypt from "bcrypt"
 const userSchema = new Schema(
     {
         username: {
-            tyepe: String,
+            type: String,
             required: true,
             unique: true,
-            lowecase: true,
+            lowercase: true,
             trim: true,
             index:true //searchinng
         },
         email: {
-            tyepe: String,
+            type: String,
             required: true,
             unique: true,
-            lowecase: true,
+            lowercase: true,
             trim: true,
         },
         fullName: {
-            tyepe: String,
+            type: String,
             required: true,
             trim: true,
             index:true
         },
         avatar: {
-            tyepe: String, //clodinary url
-            required: true,
+            type: String, //clodinary url
         },
-        avatar: {
-            tyepe: String, //clodinary url
+        coverImage: {
+            type: String, // cloudinary url
         },
         watchHistory: [
             {
@@ -52,10 +51,10 @@ const userSchema = new Schema(
 )
 
 userSchema.pre("save", async function (next) {
-    if(!this.isModifeid("password")) return next();
-    this.password = bcrypt.hash(this.password, 10)
+    if(!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10)
     next()
-}).
+});
 
 userSchema.methods.isPasswordCorrect = async function (password) {
    return await bcrypt.compare(password, this.password)
