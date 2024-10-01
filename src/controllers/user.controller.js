@@ -1,26 +1,32 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js"
-import {  User } from "../models/user.model.js"
-import { uploadOnCloudinary} from "../utils/cloudinary.js"
+import {ApiError} from "../utils/ApiError.js"
+import { User} from "../models/user.model.js"
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
-import path from "path";
+import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
+
 
 const generateAccessAndRefreshTokens = async(userId) =>{
     try {
-        const user = await User.findById(userId)
+        const user = await User.findById(userId);
+        
+        // Check if the user exists
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
         const accessToken = user.generateAccessToken()
-        const refreshToken =  user.generateRefreshToken()
+        const refreshToken = user.generateRefreshToken()
 
-        user.refreshToken = refreshToken //to add into the user
-        await user.save({validateBeforeSave : false})
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
 
-        return {accessToken, refreshToken} // generate tokens
+        return {accessToken, refreshToken}
 
     } catch (error) {
-        throw new ApiError(500, "something went wrong while generating access and refresh token")
+        throw new ApiError(500, "Something went wrong while generating referesh and access token")
     }
 }
-
 
 const registerUser = asyncHandler(async (req, res) => {
     // get user details from front end
@@ -106,7 +112,7 @@ const loginUser  = asyncHandler(async(req, res) => {
     // send success response 
 
     const {email, username, password} = req.body
-    if (!username && !email) {
+    if (!(username || email)) {
         throw new ApiError(400, "email or username is required")
     }
 
